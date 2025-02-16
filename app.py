@@ -49,7 +49,8 @@ def upload():
 
     if disease_detected:
         result.save(filename='result.jpg')
-        return send_file('result.jpg', mimetype="image/jpeg")  # ファイルを保存
+        resultpath=os.path.join("/tmp",'result.jpg')
+        return send_file(resultpath, mimetype="image/jpeg")  # ファイルを保存
     
 
 if __name__ == '__main__':
