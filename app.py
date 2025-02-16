@@ -7,8 +7,6 @@ import cv2
 
 app=Flask(__name__)
 CORS(app)
-UPLOAD_FOLDER="uploads"
-os.makedirs(UPLOAD_FOLDER,exist_ok=True)
 model=YOLO('last.pt')
 @app.route('/calculate',methods=['POST'])
 def calculate():
@@ -30,7 +28,8 @@ def upload():
         return "ファイルが見つかりません", 400
 
     file = request.files["file"]
-    img=cv2.imread(file)
+    img=os.path.join("tmp/",file.filename)
+    file.save(img)
     results=model(img,conf=0.5 ,show_conf=False,show_labels=False, stream=True)
     for result in results:
        boxes = result.boxes 
@@ -48,8 +47,8 @@ def upload():
             break
 
     if disease_detected:
-        result.save(filename='result.jpg')
         resultpath=os.path.join("/tmp",'result.jpg')
+        result.save(resultpath)
         return send_file(resultpath, mimetype="image/jpeg")  # ファイルを保存
     
 
