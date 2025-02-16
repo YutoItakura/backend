@@ -2,6 +2,7 @@ from flask import Flask,request,jsonify,send_file
 from flask_cors import CORS
 import os
 from ultralytics import YOLO
+import time
 
 app=Flask(__name__)
 CORS(app)
@@ -29,6 +30,7 @@ def upload():
 
     file = request.files["file"]
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(file_path)
     results=model(file_path,conf=0.5 ,show_conf=False,show_labels=False, stream=True)
     for result in results:
        boxes = result.boxes 
@@ -47,13 +49,14 @@ def upload():
 
     if disease_detected:
         result_filename=os.path.join(UPLOAD_FOLDER,f"result_{os.path.basename(result.path)}")
-        return send_file(result_filename,as_attachment=True, mimetype="image/jpeg")  # ファイルを保存
+        result.save(result_filename)
+        res=result_filename
+        for _ in range(10):
+          if os.path.exists(res):
+            break
+          time.sleep(0.1) 
+        return send_file(res, mimetype="image/jpeg")  # ファイルを保存
     
-
-    return jsonify({
-        "message":"Not Detected",
-        "file_path":file_path
-    })
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
