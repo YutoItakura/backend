@@ -7,6 +7,7 @@ app=Flask(__name__)
 CORS(app)
 UPLOAD_FOLDER="uploads"
 os.makedirs(UPLOAD_FOLDER,exist_ok=True)
+model=YOLO('last.pt')
 @app.route('/calculate',methods=['POST'])
 def calculate():
     try:
@@ -28,7 +29,6 @@ def upload():
 
     file = request.files["file"]
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    model=YOLO('last.pt')
     results=model(file_path,conf=0.5 ,show_conf=False,show_labels=False, stream=True)
     for result in results:
        boxes = result.boxes 
