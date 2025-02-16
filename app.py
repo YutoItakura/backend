@@ -28,7 +28,6 @@ def upload():
 
     file = request.files["file"]
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(file_path)
     model=YOLO('last.pt')
     results=model(file_path,conf=0.5 ,show_conf=False,show_labels=False, stream=True)
     for result in results:
@@ -48,7 +47,6 @@ def upload():
 
     if disease_detected:
         result_filename=os.path.join(UPLOAD_FOLDER,f"result_{os.path.basename(result.path)}")
-        result.save(result_filename)
         return send_file(result_filename,as_attachment=True, mimetype="image/jpeg")  # ファイルを保存
     
 
